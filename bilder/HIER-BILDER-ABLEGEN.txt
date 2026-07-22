@@ -1,0 +1,7 @@
+Optionale Bilder für die Karriereseite (siehe README):
+
+  hero.jpg / verfahrensmechaniker.jpg   – Hero-Foto (Querformat, ~1600px+)
+  daigler-logo.svg / .png               – Logo dunkel (Topbar)
+  daigler-logo-weiss.svg / .png         – Logo hell (Hero & Footer)
+
+Fehlt eine Datei, bleibt der grüne Farbverlauf bzw. der Text-Schriftzug stehen.

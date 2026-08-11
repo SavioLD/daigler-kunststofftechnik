@@ -276,7 +276,38 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
 /* ---------- reveal ---------- */
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
 .reveal.is-in{opacity:1;transform:none}
-@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+
+/* ---------- stats ---------- */
+.stats{position:relative;overflow:hidden;background:var(--brand-900);padding:0}
+.stats::before{content:"";position:absolute;inset:0;background:var(--grad);opacity:.97}
+.stats__in{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:20px;padding:54px 0}
+.stat{text-align:center;color:#fff}
+.stat b{display:block;white-space:nowrap;font-family:var(--f-display);font-weight:800;font-size:clamp(30px,7vw,46px);line-height:1;letter-spacing:-.02em}
+.stat b .suffix{font-size:.55em;vertical-align:top;margin-left:1px;color:#8fe0c9}
+.stat span{display:block;margin-top:8px;font-size:13px;font-weight:700;color:#bfe6d6;letter-spacing:.02em}
+@media(max-width:760px){.stats__in{grid-template-columns:1fr 1fr;gap:28px 12px;padding:42px 0}}
+
+/* ---------- CTA pulse (mobil) ---------- */
+@keyframes ctaPulse{0%{box-shadow:0 8px 24px rgba(45,138,111,.34),0 0 0 0 rgba(45,138,111,.5)}70%{box-shadow:0 8px 24px rgba(45,138,111,.34),0 0 0 16px rgba(45,138,111,0)}100%{box-shadow:0 8px 24px rgba(45,138,111,.34),0 0 0 0 rgba(45,138,111,0)}}
+.mobile-cta .btn{animation:ctaPulse 2.4s ease-out infinite}
+
+/* ---------- choice pop ---------- */
+.choice.is-selected{animation:choicePop .28s ease}
+@keyframes choicePop{0%{transform:scale(1)}45%{transform:scale(1.015)}100%{transform:scale(1)}}
+
+/* ---------- success animation ---------- */
+.result.is-visible .result__icon{animation:popIn .5s cubic-bezier(.2,.9,.3,1.25) both}
+@keyframes popIn{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+.result__icon svg{stroke-dasharray:30;stroke-dashoffset:30}
+.result.is-visible .result__icon svg{animation:drawCheck .55s .22s ease forwards}
+@keyframes drawCheck{to{stroke-dashoffset:0}}
+
+/* ---------- confetti ---------- */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:80;overflow:hidden}
+.confetti i{position:absolute;top:-14px;width:9px;height:14px;border-radius:2px;will-change:transform;animation:confFall linear forwards}
+@keyframes confFall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(106vh) rotate(720deg);opacity:.9}}
+
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}.mobile-cta .btn{animation:none}.choice.is-selected{animation:none}.result.is-visible .result__icon,.result.is-visible .result__icon svg{animation:none}.result__icon svg{stroke-dashoffset:0}.confetti{display:none}}
 
 /* ---------- Sticky Mobile-CTA ---------- */
 .mobile-cta{display:none}
@@ -448,6 +479,18 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
   </div>
 </section>
 
+<!-- ============ STATS ============ -->
+<section class="stats" aria-label="Daigler in Zahlen">
+  <div class="shell">
+    <div class="stats__in">
+      <div class="stat reveal"><b><span data-count="60">0</span><span class="suffix">+</span></b><span>Mitarbeitende</span></div>
+      <div class="stat reveal"><b><span data-count="3">0</span><span class="suffix">.</span></b><span>Generation Familienbetrieb</span></div>
+      <div class="stat reveal"><b><span data-count="30">0</span></b><span>Tage Urlaub</span></div>
+      <div class="stat reveal"><b><span data-count="100">0</span><span class="suffix">%</span></b><span>unbefristet</span></div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ ABLAUF ============ -->
 <section class="process" id="ablauf">
   <div class="shell">
@@ -580,8 +623,8 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
     </div>
 
     <p class="apply__contact">
-      Lieber direkt schreiben oder Fragen zur Bewerbung?
-      <a href="mailto:info@daigler-gmbh.de?subject=Bewerbung%20Verfahrensmechaniker%20bei%20Daigler">info@daigler-gmbh.de</a>
+      Lieber direkt schreiben oder anrufen?
+      <a href="mailto:info@daigler-gmbh.de?subject=Bewerbung%20Verfahrensmechaniker%20bei%20Daigler">info@daigler-gmbh.de</a> · <a href="tel:+4971249296-0">07124&nbsp;9296-0</a>
     </p>
   </div>
 </section>
@@ -687,6 +730,24 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
   var revealEls=document.querySelectorAll(".reveal");
   if ("IntersectionObserver" in window){ var io=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("is-in"); io.unobserve(e.target); } }); },{threshold:.12}); revealEls.forEach(function(el){ io.observe(el); }); }
   else revealEls.forEach(function(el){ el.classList.add("is-in"); });
+
+  /* Count-up Stats */
+  (function(){
+    var RM = window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches;
+    var nums = document.querySelectorAll("[data-count]");
+    if (!nums.length) return;
+    function run(el){
+      var target=parseInt(el.getAttribute("data-count"),10)||0;
+      if (RM){ el.textContent=target; return; }
+      var t0=null, dur=1200;
+      function tick(ts){ if(!t0)t0=ts; var p=Math.min((ts-t0)/dur,1); el.textContent=Math.round(target*(1-Math.pow(1-p,3))); if(p<1) requestAnimationFrame(tick); else el.textContent=target; }
+      requestAnimationFrame(tick);
+    }
+    if ("IntersectionObserver" in window){
+      var o=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ run(e.target); o.unobserve(e.target); } }); },{threshold:.4});
+      nums.forEach(function(n){ o.observe(n); });
+    } else nums.forEach(run);
+  })();
 
   /* Sticky Mobile-CTA */
   var mobileCta=document.getElementById("mobileCta"), heroEl=document.getElementById("top"), cardEl=document.querySelector(".form-card"), footerEl=document.querySelector("footer");
@@ -814,7 +875,23 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
 
   /* Erfolg gilt nur für den aktuellen Besuch – ein Seiten-Neuladen startet frisch. */
   function lockForm(){ locked=true; nav.style.display="none"; steps.forEach(function(s){ s.classList.remove("is-active"); }); bar.style.width="100%"; }
-  function finishSuccess(){ lockForm(); successEl.classList.add("is-visible"); label.textContent="Fertig"; }
+  function confettiBurst(){
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion:reduce)").matches) return;
+    var box=document.createElement("div"); box.className="confetti";
+    var colors=["#2d8a6f","#12463a","#9cc3b3","#5fd6b0","#e5f2ed","#ffffff"];
+    for (var i=0;i<80;i++){
+      var s=document.createElement("i");
+      s.style.left=(Math.random()*100)+"vw";
+      s.style.background=colors[i%colors.length];
+      s.style.animationDuration=(2.1+Math.random()*1.7)+"s";
+      s.style.animationDelay=(Math.random()*0.25)+"s";
+      if (i%3===0){ s.style.width="7px"; s.style.height="7px"; s.style.borderRadius="50%"; }
+      box.appendChild(s);
+    }
+    document.body.appendChild(box);
+    setTimeout(function(){ box.remove(); }, 4600);
+  }
+  function finishSuccess(){ lockForm(); successEl.classList.add("is-visible"); label.textContent="Fertig"; confettiBurst(); }
 
   render();
 })();

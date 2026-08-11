@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brand:#2d8a6f; --brand-900:#0e3f34; --brand-700:#1c6350; --sage:#9cc3b3; --mint:#8fe0c9;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:#0e3f34}
+  .canvas{position:relative;overflow:hidden;color:#fff;font-family:"Manrope",sans-serif}
+  body[data-format="4x5"]  .canvas{width:1080px;height:1350px}
+  body[data-format="story"].canvas,body[data-format="story"] .canvas{width:1080px;height:1920px}
+
+  .photo{position:absolute;inset:0;background-image:var(--img);background-size:cover;background-position:34% 22%;background-repeat:no-repeat}
+  /* Markenrahmen */
+  .frame{position:absolute;inset:0;border:14px solid var(--brand);pointer-events:none;z-index:6}
+  .frame::after{content:"";position:absolute;inset:14px;border:2px solid rgba(255,255,255,.28)}
+  /* Scrims für Lesbarkeit */
+  .scrim-top{position:absolute;left:0;right:0;top:0;height:34%;background:linear-gradient(180deg,rgba(9,45,37,.78),rgba(9,45,37,0));z-index:2}
+  .scrim-bot{position:absolute;left:0;right:0;bottom:0;z-index:2}
+  body[data-format="4x5"]  .scrim-bot{height:64%;background:linear-gradient(180deg,rgba(9,45,37,0) 0%,rgba(9,47,38,.62) 42%,rgba(10,52,42,.93) 74%,#0a3428 100%)}
+  body[data-format="story"] .scrim-bot{height:60%;background:linear-gradient(180deg,rgba(9,45,37,0) 0%,rgba(9,47,38,.58) 38%,rgba(10,52,42,.92) 70%,#0a3428 100%)}
+  /* grüner Verlaufskeil rechts (Markenakzent) */
+  .tint{position:absolute;inset:0;z-index:1;background:linear-gradient(115deg,rgba(14,63,52,.35) 0%,rgba(14,63,52,0) 46%,rgba(45,138,111,.28) 100%);mix-blend-mode:multiply}
+
+  .wrap{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column}
+  .pad{padding:64px 62px}
+  body[data-format="story"] .pad{padding:150px 68px 120px}
+
+  /* Kopf */
+  .head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .brandchip{display:inline-flex;align-items:baseline;gap:10px;background:#fff;border-radius:999px;padding:14px 24px;box-shadow:0 10px 30px rgba(0,0,0,.28)}
+  .brandchip b{font-weight:800;font-size:30px;letter-spacing:.14em;color:var(--brand-700)}
+  .brandchip span{font-weight:700;font-size:12.5px;letter-spacing:.2em;text-transform:uppercase;color:#5c8377}
+  .loc{display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:#dff3ec;background:rgba(9,45,37,.5);border:1.5px solid rgba(255,255,255,.28);border-radius:999px;padding:12px 18px;backdrop-filter:blur(3px)}
+  .loc svg{width:17px;height:17px;stroke:var(--mint);fill:none;stroke-width:2}
+
+  /* Fuß / Botschaft */
+  .msg{margin-top:auto;display:flex;flex-direction:column;align-items:flex-start}
+  .eyebrow{display:inline-flex;align-items:center;gap:12px;font-weight:800;font-size:19px;letter-spacing:.14em;text-transform:uppercase;color:var(--mint);margin-bottom:22px}
+  .eyebrow .bar{width:46px;height:4px;border-radius:3px;background:var(--mint)}
+  h1{font-weight:800;line-height:1.03;letter-spacing:-.02em;text-shadow:0 3px 26px rgba(4,30,24,.55)}
+  body[data-format="4x5"]  h1{font-size:82px}
+  body[data-format="story"] h1{font-size:96px}
+  h1 .hl{color:var(--mint)}
+  .chips{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+  .chip{font-weight:800;font-size:24px;color:#eafaf4;background:rgba(45,138,111,.34);border:2px solid rgba(143,224,201,.55);border-radius:999px;padding:14px 26px}
+  body[data-format="story"] .chip{font-size:27px;padding:16px 30px}
+  .ctarow{display:flex;align-items:center;gap:26px;margin-top:44px;flex-wrap:wrap}
+  .cta{display:inline-flex;align-items:center;gap:16px;background:#fff;color:var(--brand-900);font-weight:800;border-radius:16px;box-shadow:0 16px 40px rgba(0,0,0,.32)}
+  body[data-format="4x5"]  .cta{font-size:34px;padding:24px 40px}
+  body[data-format="story"] .cta{font-size:38px;padding:28px 46px}
+  .cta .arw{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--brand)}
+  .cta .arw svg{width:26px;height:26px;stroke:#fff;stroke-width:3;fill:none}
+  .url{font-weight:800;font-size:23px;letter-spacing:.02em;color:#cfeee3}
+  body[data-format="story"] .url{font-size:26px}
+</style>
+</head>
+<body data-format="4x5">
+  <div class="canvas">
+    <div class="photo"></div>
+    <div class="tint"></div>
+    <div class="scrim-top"></div>
+    <div class="scrim-bot"></div>
+    <div class="frame"></div>
+    <div class="wrap pad">
+      <div class="head">
+        <span class="brandchip"><b>DAIGLER</b><span>Kunststofftechnik</span></span>
+        <span class="loc"><svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>Trochtelfingen</span>
+      </div>
+      <div class="msg">
+        <span class="eyebrow"><span class="bar"></span><span id="eye">Verfahrensmechaniker (m/w/d)</span></span>
+        <h1 id="head">Hier läuft nichts <span class="hl">ohne dich.</span></h1>
+        <div class="chips" id="chips"></div>
+        <div class="ctarow">
+          <span class="cta">Jetzt in 60&nbsp;Sek. bewerben <span class="arw"><svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span></span>
+          <span class="url">daigler-gmbh.de/karriere</span>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+  var P=new URLSearchParams(location.search);
+  var fmt=P.get("f")||"4x5"; document.body.setAttribute("data-format",fmt);
+  var img=P.get("img")||"daigler-vm.jpg";
+  document.querySelector(".photo").style.setProperty("--img","url('"+img+"')");
+  var pos=P.get("pos"); if(pos) document.querySelector(".photo").style.backgroundPosition=pos;
+  var V=P.get("v")||"A";
+  var DATA={
+    A:{ head:'Hier läuft nichts <span class="hl">ohne dich.</span>', eye:'Verfahrensmechaniker (m/w/d)', chips:['30 Tage Urlaub','JobRad','unbefristet'] },
+    B:{ head:'30 Tage Urlaub. JobRad. <span class="hl">Und Technik zum Verlieben.</span>', eye:'Verfahrensmechaniker (m/w/d)', chips:['unbefristet','Fitnessstudio','Kaffee &amp; Obst gratis'] },
+    C:{ head:'Dein Handwerk.<br>Deine Schicht.<br><span class="hl">Deine Zukunft.</span>', eye:'Verfahrensmechaniker (m/w/d) · Daigler', chips:['2K-/3K-Spritzguss','Familienbetrieb','sicher &amp; unbefristet'] }
+  };
+  var d=DATA[V]||DATA.A;
+  document.getElementById("head").innerHTML=d.head;
+  document.getElementById("eye").innerHTML=d.eye;
+  document.getElementById("chips").innerHTML=d.chips.map(function(c){return '<span class="chip">'+c+'</span>';}).join("");
+</script>
+</body>
+</html>

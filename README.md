@@ -18,11 +18,12 @@ abgeleitet aus der Stellenanzeige) und als schlanker Single-Position-Funnel
 
 Im `<script>`-Bereich von `index.html` ganz oben stehen die Konfigurationswerte:
 
-- `WEBHOOK_URL` – aktuell `PLACEHOLDER_DAIGLER_LEADTABLE_WEBHOOK`.
-  **Muss durch den Daigler-eigenen Leadtable-Webhook ersetzt werden**, sonst
-  landen die Bewerbungen nirgends. Solange der Platzhalter steht, sieht der
-  Bewerber im Fehlerfall den Hinweis, sich direkt an `info@daigler-gmbh.de` zu
-  wenden.
+- `WEBHOOK_URL` – konfiguriert: LeadTable-Generic-Webhook der Daigler-Tabelle
+  (`api-v2.lead-table.com/api/webhook/generic/…`). Bewerbungen landen damit
+  direkt in LeadTable. Bei einem Fehler sieht der Bewerber den Hinweis, sich
+  direkt an `info@daigler-gmbh.de` zu wenden. Felder: `vorname`, `nachname`,
+  `name`, `email`, `telefon`, `stelle`, `erfahrung`, `lebenslauf`, `quelle`,
+  `seite` – ggf. in LeadTable den Spalten zuordnen.
 - `SUPABASE_URL` / `SUPABASE_KEY` – optional. Leer lassen, wenn kein
   CV-Upload gewünscht ist (der Upload wird dann sauber übersprungen, das
   Formular funktioniert trotzdem). Für den Upload ein eigenes Supabase-Projekt

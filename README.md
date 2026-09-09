@@ -11,23 +11,23 @@ abgeleitet aus der Stellenanzeige) und als schlanker Single-Position-Funnel
 ## Inhalt
 
 - `index.html` – die komplette Seite (self-contained, keine Build-Schritte nötig)
-- `supabase-bewerbungen.sql` – legt den Storage-Bucket für den optionalen Lebenslauf-Upload an (nur nötig, wenn CV-Upload aktiviert wird)
 - `.nojekyll` – sorgt dafür, dass GitHub Pages die Dateien 1:1 ausliefert
 
-## Vor dem Live-Schalten (WICHTIG)
+## Konfiguration
 
-Im `<script>`-Bereich von `index.html` ganz oben stehen die Konfigurationswerte:
+Im `<script>`-Bereich von `index.html` ganz oben steht:
 
-- `WEBHOOK_URL` – konfiguriert: LeadTable-Generic-Webhook der Daigler-Tabelle
+- `WEBHOOK_URL` – LeadTable-Generic-Webhook der Daigler-Tabelle
   (`api-v2.lead-table.com/api/webhook/generic/…`). Bewerbungen landen damit
   direkt in LeadTable. Bei einem Fehler sieht der Bewerber den Hinweis, sich
-  direkt an `info@daigler-gmbh.de` zu wenden. Felder: `vorname`, `nachname`,
-  `name`, `email`, `telefon`, `stelle`, `erfahrung`, `lebenslauf`, `quelle`,
-  `seite` – ggf. in LeadTable den Spalten zuordnen.
-- `SUPABASE_URL` / `SUPABASE_KEY` – optional. Leer lassen, wenn kein
-  CV-Upload gewünscht ist (der Upload wird dann sauber übersprungen, das
-  Formular funktioniert trotzdem). Für den Upload ein eigenes Supabase-Projekt
-  anlegen und `supabase-bewerbungen.sql` einmalig ausführen.
+  direkt an `info@daigler-gmbh.de` zu wenden. Übergebene Felder: `vorname`,
+  `nachname`, `email`, `telefon`, `stelle`, `erfahrung`, `fuehrerschein`,
+  `deutschniveau`, `datenschutz`, `quelle`, `seite` – ggf. in LeadTable den
+  Spalten zuordnen.
+
+Kein Lebenslauf-Upload: Der CV wird bewusst nicht abgefragt (kein Backend nötig,
+keine Wartung). Bewerber qualifizieren sich über Erfahrung, Führerschein und
+Deutschniveau; der Lebenslauf wird im persönlichen Erstkontakt geklärt.
 
 ## Bilder (Hero-Foto & Logo)
 
@@ -58,6 +58,6 @@ bricht).
 ## Bewerbungen (Leadtable)
 
 Jede abgeschlossene Bewerbung wird per Webhook an Leadtable gesendet
-(Felder u. a. `stelle`, `erfahrung`, `vorname`, `nachname`, `telefon`,
-`email`, `lebenslauf`, `quelle`). Der Webhook ist in `index.html` in der
-Variable `WEBHOOK_URL` hinterlegt.
+(Felder u. a. `vorname`, `nachname`, `telefon`, `email`, `stelle`,
+`erfahrung`, `fuehrerschein`, `deutschniveau`, `quelle`). Der Webhook ist in
+`index.html` in der Variable `WEBHOOK_URL` hinterlegt.

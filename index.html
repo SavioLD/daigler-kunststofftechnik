@@ -589,16 +589,6 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
           </div>
           <div class="field"><label for="telefon">Telefonnummer *</label><input id="telefon" name="telefon" type="tel" inputmode="tel" autocomplete="tel" placeholder="z. B. 0151 23456789" required /></div>
           <div class="field"><label for="email">E-Mail *</label><input id="email" name="email" type="email" autocomplete="email" placeholder="z. B. max@beispiel.de" required /></div>
-          <div class="field">
-            <label for="lebenslauf">Lebenslauf/Qualifikationen (keine Pflicht)</label>
-            <label class="upload" id="uploadBox" for="lebenslauf">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg>
-              <span id="uploadLabel">Klicken oder Datei hierher ziehen (PDF, Word, Foto · max. 10&nbsp;MB)</span>
-              <button type="button" class="upload__remove" id="uploadRemove" hidden aria-label="Datei entfernen">×</button>
-              <input id="lebenslauf" name="lebenslauf" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,application/pdf,image/jpeg,image/png,image/webp,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
-            </label>
-            <p class="upload-error" id="uploadError"></p>
-          </div>
           <p class="consent">
             Mit dem Absenden erkläre ich mich damit einverstanden, dass die Daigler Kunststofftechnik GmbH meine Daten zur Bearbeitung meiner
             Bewerbung und zur Kontaktaufnahme verarbeitet (Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;a DSGVO). Meine Daten werden
@@ -685,15 +675,9 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
   "use strict";
 
   /* ================================================================
-     KONFIGURATION – vor dem Live-Schalten mit Daigler-eigenen Werten
-     befüllen (Leadtable-Webhook + optional Supabase für CV-Upload).
+     KONFIGURATION – LeadTable-Generic-Webhook der Daigler-Tabelle.
      ================================================================ */
   var WEBHOOK_URL   = "https://api-v2.lead-table.com/api/webhook/generic/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0YWJsZUlEIjoiNmE2ZjNjNWRjMjczYTRlZjg2YmYyOTEyIiwiY3VzdG9tZXJJRCI6IjZhNjBkNWMxNjlhMWU0ZTRmNjFmOTNmNSIsImFnZW5jeUlEIjoiNjliZDc3NzVlNGQxN2IzOGVkNjUzZDE2IiwiaWF0IjoxNzg1Njc0ODQ1fQ.OgIxmGMkJjOUmkRx4QEaZBoTl_Zf3vOTosoRhm2tK9o"; // Daigler Leadtable-Webhook (Generic)
-  var SUPABASE_URL  = ""; // optional: Daigler-eigenes Supabase-Projekt (leer = CV-Upload wird übersprungen)
-  var SUPABASE_KEY  = "";
-  var UPLOAD_BUCKET = "bewerbungen";
-  var UPLOAD_MAX    = 10 * 1024 * 1024;
-  var UPLOAD_TYPES  = ["application/pdf","image/jpeg","image/png","image/webp","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
   var STELLE        = "Verfahrensmechaniker (m/w/d)";
 
   /* ---------- Logo laden (Fallback: Text) ----------
@@ -822,55 +806,24 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
     })(0);
   })();
 
-  /* Upload */
-  var fileInput=document.getElementById("lebenslauf"), uploadBox=document.getElementById("uploadBox"), uploadLabel=document.getElementById("uploadLabel"),
-      uploadRemove=document.getElementById("uploadRemove"), uploadError=document.getElementById("uploadError"), uploadDefaultText=uploadLabel.textContent, cvFile=null;
-  function setUploadError(m){ uploadError.textContent=m||""; uploadError.classList.toggle("is-visible", !!m); }
-  function acceptFile(file){
-    setUploadError(""); if(!file) return;
-    if (UPLOAD_TYPES.indexOf(file.type)===-1){ setUploadError("Bitte nur PDF, Word oder Foto (JPG/PNG) hochladen."); return; }
-    if (file.size>UPLOAD_MAX){ setUploadError("Die Datei ist größer als 10 MB. Bitte eine kleinere Datei wählen."); return; }
-    cvFile=file; uploadBox.classList.add("has-file");
-    uploadLabel.textContent=file.name+" ("+(file.size/1024/1024).toFixed(1).replace(".",",")+" MB)"; uploadRemove.hidden=false;
-  }
-  function clearFile(){ cvFile=null; fileInput.value=""; uploadBox.classList.remove("has-file"); uploadLabel.textContent=uploadDefaultText; uploadRemove.hidden=true; setUploadError(""); }
-  fileInput.addEventListener("change", function(){ acceptFile(fileInput.files[0]); });
-  uploadRemove.addEventListener("click", function(ev){ ev.preventDefault(); ev.stopPropagation(); clearFile(); });
-  ["dragover","dragenter"].forEach(function(t){ uploadBox.addEventListener(t, function(ev){ ev.preventDefault(); uploadBox.classList.add("is-drag"); }); });
-  ["dragleave","drop"].forEach(function(t){ uploadBox.addEventListener(t, function(ev){ ev.preventDefault(); uploadBox.classList.remove("is-drag"); }); });
-  uploadBox.addEventListener("drop", function(ev){ if(ev.dataTransfer&&ev.dataTransfer.files&&ev.dataTransfer.files[0]) acceptFile(ev.dataTransfer.files[0]); });
-  function uploadCv(){
-    if(!cvFile || !SUPABASE_URL || !SUPABASE_KEY) return Promise.resolve("");  // ohne Supabase-Konfig: Upload überspringen
-    var uuid=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():(Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,10));
-    var safeName=cvFile.name.replace(/[^a-zA-Z0-9._-]+/g,"_").slice(-80), path=uuid+"/"+safeName;
-    function attempt(){
-      return fetch(SUPABASE_URL+"/storage/v1/object/"+UPLOAD_BUCKET+"/"+path, { method:"POST", headers:{ "apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":cvFile.type,"x-upsert":"false" }, body:cvFile })
-        .then(function(res){ if(!res.ok) throw new Error("HTTP "+res.status); return SUPABASE_URL+"/storage/v1/object/public/"+UPLOAD_BUCKET+"/"+path; });
-    }
-    return attempt().catch(function(){ return attempt().catch(function(){ var e=new Error("upload_failed"); e.isUploadError=true; throw e; }); });
-  }
-
   function collect(){
     function val(name){ var c=form.querySelector('input[name="'+name+'"]:checked'); if(c) return c.value; var inp=form.querySelector('input[name="'+name+'"]:not([type="radio"])'); return inp?inp.value.trim():""; }
     return { vorname:val("vorname"), nachname:val("nachname"), email:val("email"), telefon:val("telefon"),
              stelle:STELLE, erfahrung:val("erfahrung"), fuehrerschein:val("fuehrerschein"), deutschniveau:val("deutschniveau"),
-             lebenslauf:"", datenschutz:"Ja (Einwilligung mit Absenden, Art. 6 Abs. 1 lit. a DSGVO)",
+             datenschutz:"Ja (Einwilligung mit Absenden, Art. 6 Abs. 1 lit. a DSGVO)",
              quelle:"Karriere-Landingpage Daigler", seite:location.href };
   }
   function submit(){
     if (form.querySelector('input[name="firma_website"]').value){ finishSuccess(); return; }
-    submitting=true; btnNext.disabled=true; btnNext.textContent=cvFile?"Lebenslauf wird hochgeladen …":"Wird gesendet …"; errBox.classList.remove("is-visible");
-    uploadCv().then(function(cvUrl){
-      btnNext.textContent="Wird gesendet …";
-      var data=collect(); data.lebenslauf=cvUrl||"nicht hochgeladen"; var payload=JSON.stringify(data);
-      return fetch(WEBHOOK_URL,{ method:"POST", headers:{ "Content-Type":"application/json" }, body:payload })
-        .then(function(res){ if(!res.ok) throw new Error("HTTP "+res.status); finishSuccess(); })
-        .catch(function(){ return fetch(WEBHOOK_URL,{ method:"POST", mode:"no-cors", headers:{ "Content-Type":"text/plain" }, body:payload }).then(finishSuccess); });
-    }).catch(function(err){
-      submitting=false; btnNext.disabled=false; btnNext.textContent="Bewerbung absenden";
-      if (err&&err.isUploadError) setUploadError("Der Upload hat leider nicht geklappt. Bitte versuche es noch einmal – oder entferne die Datei über das × und schicke den Lebenslauf später an info@daigler-gmbh.de.");
-      else errBox.classList.add("is-visible");
-    });
+    submitting=true; btnNext.disabled=true; btnNext.textContent="Wird gesendet …"; errBox.classList.remove("is-visible");
+    var data=collect(), payload=JSON.stringify(data);
+    fetch(WEBHOOK_URL,{ method:"POST", headers:{ "Content-Type":"application/json" }, body:payload })
+      .then(function(res){ if(!res.ok) throw new Error("HTTP "+res.status); finishSuccess(); })
+      .catch(function(){
+        fetch(WEBHOOK_URL,{ method:"POST", mode:"no-cors", headers:{ "Content-Type":"text/plain" }, body:payload })
+          .then(finishSuccess)
+          .catch(function(){ submitting=false; btnNext.disabled=false; btnNext.textContent="Bewerbung absenden"; errBox.classList.add("is-visible"); });
+      });
   }
 
   /* Erfolg gilt nur für den aktuellen Besuch – ein Seiten-Neuladen startet frisch. */

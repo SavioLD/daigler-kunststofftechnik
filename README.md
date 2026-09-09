@@ -22,12 +22,22 @@ Im `<script>`-Bereich von `index.html` ganz oben steht:
   direkt in LeadTable. Bei einem Fehler sieht der Bewerber den Hinweis, sich
   direkt an `info@daigler-gmbh.de` zu wenden. Übergebene Felder: `vorname`,
   `nachname`, `email`, `telefon`, `stelle`, `erfahrung`, `fuehrerschein`,
-  `deutschniveau`, `datenschutz`, `quelle`, `seite` – ggf. in LeadTable den
-  Spalten zuordnen.
+  `deutschniveau`, `schicht`, `datenschutz`, `quelle`, `seite` – ggf. in
+  LeadTable den Spalten zuordnen.
+
+## Vorfilter (Qualifizierung)
+
+4 Qualifizierungsfragen vor den Kontaktdaten: **Erfahrung, Führerschein,
+Deutschniveau, Schichtbereitschaft**. Jede Antwort hat Punkte (0 = schwächste
+Passung). Liegt die Gesamtpunktzahl unter dem Schwellwert `SCREEN_MIN` (in
+`index.html`, Standard = 2) – praktisch also nur, wenn jemand **durchweg die
+schwächsten** Antworten wählt – erscheint eine **freundliche Absage** und es
+wird **kein Lead** an LeadTable gesendet. Motivierte Quereinsteiger:innen (z. B.
+ohne Erfahrung, aber schichtbereit und mit ausreichend Deutsch) kommen durch.
+Schwellwert/Punkte lassen sich oben im Script (`SCORE`, `SCREEN_MIN`) anpassen.
 
 Kein Lebenslauf-Upload: Der CV wird bewusst nicht abgefragt (kein Backend nötig,
-keine Wartung). Bewerber qualifizieren sich über Erfahrung, Führerschein und
-Deutschniveau; der Lebenslauf wird im persönlichen Erstkontakt geklärt.
+keine Wartung). Der Lebenslauf wird im persönlichen Erstkontakt geklärt.
 
 ## Bilder (Hero-Foto & Logo)
 

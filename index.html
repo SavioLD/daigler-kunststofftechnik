@@ -198,7 +198,7 @@ section[id],.form-card{scroll-margin-top:80px}
 .apply__contact a{color:var(--brand-dark);text-decoration:underline;white-space:nowrap}
 .form-card__head{padding:24px 32px 0}
 .progress{height:6px;background:var(--panel-2);border-radius:999px;overflow:hidden}
-.progress__bar{height:100%;width:25%;background:var(--brand);border-radius:999px;transition:width .35s ease}
+.progress__bar{height:100%;width:20%;background:var(--brand);border-radius:999px;transition:width .35s ease}
 .progress__label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-mute);margin-top:10px;font-weight:700}
 .form-card__body{padding:24px 32px 34px;min-height:360px;display:flex;flex-direction:column}
 @media(max-width:560px){.form-card__body,.form-card__head{padding-left:18px;padding-right:18px}}
@@ -535,7 +535,7 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
     <div class="form-card">
       <div class="form-card__head">
         <div class="progress"><div class="progress__bar" id="progressBar"></div></div>
-        <div class="progress__label"><span id="stepLabel">Schritt 1 von 4</span><span>~60 Sek.</span></div>
+        <div class="progress__label"><span id="stepLabel">Schritt 1 von 5</span><span>~60 Sek.</span></div>
       </div>
 
       <form class="form-card__body" id="applyForm" novalidate>
@@ -579,8 +579,20 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
           </div>
         </div>
 
-        <!-- STEP 4 · Kontakt -->
+        <!-- STEP 4 · Schichtbereitschaft -->
         <div class="fstep" data-step="4">
+          <h3>Schichtbereitschaft</h3>
+          <p class="hint">Die Stelle läuft im Wechsel zwischen Früh- und Spätschicht.</p>
+          <p class="q">Bist du bereit, in Früh-/Spätschicht zu arbeiten?<span class="req">*</span></p>
+          <div class="choice-grid" data-field="schicht">
+            <label class="choice"><input type="radio" name="schicht" value="Ja, kein Problem" /><span class="key">A</span><span>Ja, kein Problem</span></label>
+            <label class="choice"><input type="radio" name="schicht" value="Eventuell / nach Absprache" /><span class="key">B</span><span>Eventuell <small>nach Absprache</small></span></label>
+            <label class="choice"><input type="radio" name="schicht" value="Nein, nur Tagschicht" /><span class="key">C</span><span>Nein, nur Tagschicht</span></label>
+          </div>
+        </div>
+
+        <!-- STEP 5 · Kontakt -->
+        <div class="fstep" data-step="5">
           <h3>Du hast es fast geschafft</h3>
           <p class="hint">Hinterlasse kurz deine Kontaktdaten. Wir melden uns persönlich bei dir.</p>
           <div class="frow">
@@ -603,6 +615,13 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
           <div class="result__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
           <h3>Bewerbung eingegangen</h3>
           <p>Stark! Wir haben deine Bewerbung erhalten und <strong>melden uns persönlich bei dir</strong>. Schau auch mal in dein Postfach – bis gleich.</p>
+        </div>
+
+        <!-- SCREEN-OUT (freundliche Absage) -->
+        <div class="result" id="screenoutView">
+          <div class="result__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="m22 6-10 7L2 6"/></svg></div>
+          <h3>Danke für dein Interesse!</h3>
+          <p>Für die Stelle als Verfahrensmechaniker:in setzen wir eine gewisse technische Nähe, ausreichende Deutschkenntnisse und die Bereitschaft zur Früh-/Spätschicht voraus. Nach deinen Angaben passt das gerade noch nicht ganz zusammen.<br /><br />Du bist überzeugt, dass du trotzdem zu uns passt? Dann schreib uns gerne direkt an <a href="mailto:info@daigler-gmbh.de?subject=Initiativbewerbung%20Daigler">info@daigler-gmbh.de</a>.<br /><br />Aus Versehen etwas falsch angeklickt? Lade die Seite einfach neu und probier’s nochmal.</p>
         </div>
 
         <div class="fnav" id="formNav">
@@ -705,10 +724,27 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
   var form=document.getElementById("applyForm"), steps=Array.prototype.slice.call(form.querySelectorAll(".fstep")), TOTAL=steps.length;
   var bar=document.getElementById("progressBar"), label=document.getElementById("stepLabel");
   var btnNext=document.getElementById("btnNext"), btnBack=document.getElementById("btnBack"), nav=document.getElementById("formNav");
-  var errBox=document.getElementById("formError"), successEl=document.getElementById("successView");
+  var errBox=document.getElementById("formError"), successEl=document.getElementById("successView"), screenoutEl=document.getElementById("screenoutView");
   var current=1, submitting=false, locked=false;
 
   function stepEl(n){ return steps[n-1]; }
+  function selVal(name){ var c=form.querySelector('input[name="'+name+'"]:checked'); return c?c.value:""; }
+
+  /* ---- Vorfilter: Punkte je Qualifizierungsantwort (0 = schwächste Passung) ----
+     Löst NUR beim „alles durchweg schwach"-Fall eine freundliche Absage aus. */
+  var SCORE = {
+    erfahrung:    { "Keine Erfahrung / Quereinsteiger:in":0, "Weniger als 3 Jahre":1, "3 bis 5 Jahre":2, "Mehr als 5 Jahre":3 },
+    fuehrerschein:{ "Nein, keinen Führerschein":0, "Ja, Klasse B (Pkw)":1, "Ja, weitere Klassen (z. B. Stapler/Lkw)":1 },
+    deutschniveau:{ "Grundkenntnisse (A1/A2)":0, "Gut (B1/B2)":1, "Fließend (C1/C2)":2, "Muttersprache":2 },
+    schicht:      { "Nein, nur Tagschicht":0, "Eventuell / nach Absprache":1, "Ja, kein Problem":2 }
+  };
+  var SCREEN_MIN = 2; // Gesamtpunktzahl < 2 (praktisch: fast alles schwächste Antwort) => Absage
+  function qualiScore(){
+    return (SCORE.erfahrung[selVal("erfahrung")]||0)
+         + (SCORE.fuehrerschein[selVal("fuehrerschein")]||0)
+         + (SCORE.deutschniveau[selVal("deutschniveau")]||0)
+         + (SCORE.schicht[selVal("schicht")]||0);
+  }
 
   /* Reveal */
   var revealEls=document.querySelectorAll(".reveal");
@@ -758,7 +794,7 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
   function render(){
     if (locked) return;
     steps.forEach(function(s,i){ s.classList.toggle("is-active", i===current-1); });
-    successEl.classList.remove("is-visible");
+    successEl.classList.remove("is-visible"); screenoutEl.classList.remove("is-visible");
     nav.style.display="flex";
     bar.style.width=(current/TOTAL*100)+"%";
     label.textContent="Schritt "+current+" von "+TOTAL;
@@ -769,6 +805,8 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
   }
   function next(){
     if (locked || !stepValid(current) || submitting) return;
+    /* Nach der letzten Qualifizierungsfrage (vor Kontakt) vorfiltern */
+    if (current===TOTAL-1 && qualiScore()<SCREEN_MIN){ showScreenout(); return; }
     if (current===TOTAL){ submit(); return; }
     current++; render();
     var card=document.querySelector(".form-card");
@@ -809,7 +847,7 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
   function collect(){
     function val(name){ var c=form.querySelector('input[name="'+name+'"]:checked'); if(c) return c.value; var inp=form.querySelector('input[name="'+name+'"]:not([type="radio"])'); return inp?inp.value.trim():""; }
     return { vorname:val("vorname"), nachname:val("nachname"), email:val("email"), telefon:val("telefon"),
-             stelle:STELLE, erfahrung:val("erfahrung"), fuehrerschein:val("fuehrerschein"), deutschniveau:val("deutschniveau"),
+             stelle:STELLE, erfahrung:val("erfahrung"), fuehrerschein:val("fuehrerschein"), deutschniveau:val("deutschniveau"), schicht:val("schicht"),
              datenschutz:"Ja (Einwilligung mit Absenden, Art. 6 Abs. 1 lit. a DSGVO)",
              quelle:"Karriere-Landingpage Daigler", seite:location.href };
   }
@@ -844,7 +882,8 @@ footer{padding:52px 0 36px;background:var(--brand-900);color:#dceee7}
     document.body.appendChild(box);
     setTimeout(function(){ box.remove(); }, 4600);
   }
-  function finishSuccess(){ lockForm(); successEl.classList.add("is-visible"); label.textContent="Fertig"; confettiBurst(); }
+  function finishSuccess(){ lockForm(); screenoutEl.classList.remove("is-visible"); successEl.classList.add("is-visible"); label.textContent="Fertig"; confettiBurst(); }
+  function showScreenout(){ lockForm(); successEl.classList.remove("is-visible"); screenoutEl.classList.add("is-visible"); label.textContent="Danke"; }
 
   render();
 })();

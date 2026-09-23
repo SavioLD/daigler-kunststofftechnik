@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{ --brand:#2d8a6f; --brand-900:#0e3f34; --brand-700:#216b57; --sage:#9cc3b3; --mint:#8fe0c9; }
+  html,body{background:#0e3f34}
+  .pfp{position:relative;width:1080px;height:1080px;overflow:hidden;font-family:"Manrope",sans-serif;
+       background:radial-gradient(120% 120% at 50% 30%, #2f9a78 0%, #218067 42%, #12463a 100%)}
+  /* dezenter Ring als Badge-Anmutung (innerhalb des Kreis-Zuschnitts) */
+  .ring{position:absolute;inset:118px;border-radius:50%;border:4px solid rgba(143,224,201,.35)}
+  .ring2{position:absolute;inset:150px;border-radius:50%;border:2px solid rgba(255,255,255,.10)}
+  /* Hintergrund-Motiv: Tropfen (Kunststoff/Spritzguss) sehr dezent */
+  .bgdrop{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:760px;height:760px;opacity:.06}
+  .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+  .emblem{width:150px;height:150px;margin-bottom:26px;display:grid;place-items:center}
+  .emblem svg{width:150px;height:150px}
+  .word{font-weight:800;color:#ffffff;letter-spacing:.16em;line-height:1;font-size:150px;text-shadow:0 4px 30px rgba(4,30,24,.45);padding-left:.16em}
+  .rule{width:200px;height:5px;border-radius:3px;background:var(--mint);margin:34px 0 26px}
+  .sub{font-weight:700;color:#c9f2e4;letter-spacing:.34em;text-transform:uppercase;font-size:38px;padding-left:.34em}
+
+  /* Monogramm-Variante */
+  body[data-v="monogram"] .word,body[data-v="monogram"] .rule{display:none}
+  body[data-v="monogram"] .emblem{width:520px;height:520px;margin:0}
+  body[data-v="monogram"] .mono{position:relative;width:470px;height:470px;border-radius:50%;
+       background:linear-gradient(160deg,#ffffff, #eafaf4);display:grid;place-items:center;box-shadow:0 30px 70px rgba(4,30,24,.4)}
+  body[data-v="monogram"] .mono b{font-weight:800;color:var(--brand-700);font-size:300px;line-height:1;letter-spacing:-.02em}
+  body[data-v="monogram"] .emblem > svg{display:none}
+  body[data-v="monogram"] .sub{margin-top:70px;font-size:40px}
+  body:not([data-v="monogram"]) .mono{display:none}
+</style>
+</head>
+<body data-v="wordmark">
+  <div class="pfp">
+    <svg class="bgdrop" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 6 C 70 40, 84 52, 84 68 A 34 34 0 1 1 16 68 C 16 52, 30 40, 50 6 Z" fill="#8fe0c9"/></svg>
+    <div class="ring"></div>
+    <div class="ring2"></div>
+    <div class="center">
+      <div class="emblem">
+        <!-- Tropfen mit Glanz = Kunststoff/Spritzguss -->
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M50 8 C 70 42, 82 54, 82 68 A 32 32 0 1 1 18 68 C 18 54, 30 42, 50 8 Z" fill="none" stroke="#8fe0c9" stroke-width="6"/>
+          <circle cx="40" cy="66" r="9" fill="#8fe0c9" opacity=".9"/>
+        </svg>
+        <div class="mono"><b>D</b></div>
+      </div>
+      <div class="word">DAIGLER</div>
+      <div class="rule"></div>
+      <div class="sub">Kunststofftechnik</div>
+    </div>
+  </div>
+<script>
+  var v=new URLSearchParams(location.search).get("v"); if(v) document.body.setAttribute("data-v",v);
+</script>
+</body>
+</html>

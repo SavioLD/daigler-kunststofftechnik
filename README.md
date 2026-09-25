@@ -28,13 +28,18 @@ Im `<script>`-Bereich von `index.html` ganz oben steht:
 ## Vorfilter (Qualifizierung)
 
 4 Qualifizierungsfragen vor den Kontaktdaten: **Erfahrung, Führerschein,
-Deutschniveau, Schichtbereitschaft**. Jede Antwort hat Punkte (0 = schwächste
-Passung). Liegt die Gesamtpunktzahl unter dem Schwellwert `SCREEN_MIN` (in
-`index.html`, Standard = 2) – praktisch also nur, wenn jemand **durchweg die
-schwächsten** Antworten wählt – erscheint eine **freundliche Absage** und es
-wird **kein Lead** an LeadTable gesendet. Motivierte Quereinsteiger:innen (z. B.
-ohne Erfahrung, aber schichtbereit und mit ausreichend Deutsch) kommen durch.
-Schwellwert/Punkte lassen sich oben im Script (`SCORE`, `SCREEN_MIN`) anpassen.
+Deutschniveau, Schichtbereitschaft**.
+
+- **Harter Ausschluss:** Wer bei der Erfahrung **„Keine Erfahrung"** wählt,
+  bekommt sofort eine **freundliche Absage** – kein Weiterkommen, **kein Lead**
+  (Konstante `HARD_OUT_ERFAHRUNG` in `index.html`).
+- **Punkte-Vorfilter:** Zusätzlich hat jede Antwort Punkte (0 = schwächste
+  Passung). Liegt die Gesamtpunktzahl unter `SCREEN_MIN` (Standard = 2) – also
+  wenn jemand durchweg die schwächsten Antworten wählt – ebenfalls freundliche
+  Absage, kein Lead.
+
+Schwellwert/Punkte/Ausschluss lassen sich oben im Script (`SCORE`,
+`SCREEN_MIN`, `HARD_OUT_ERFAHRUNG`) anpassen.
 
 Kein Lebenslauf-Upload: Der CV wird bewusst nicht abgefragt (kein Backend nötig,
 keine Wartung). Der Lebenslauf wird im persönlichen Erstkontakt geklärt.

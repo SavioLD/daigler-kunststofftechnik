@@ -62,7 +62,7 @@ In unter 60 Sekunden bewerben, ganz ohne Anschreiben. 👉
 **Beschreibung:** Verfahrensmechaniker (m/w/d) · unbefristet
 
 **Kurzversion:**
-30 Tage Urlaub, JobRad, Fitnessstudio + moderner 2K-/3K-Spritzguss. Verfahrensmechaniker (m/w/d) in Trochtelfingen. Quereinstieg willkommen. Jetzt bewerben.
+30 Tage Urlaub, JobRad, Fitnessstudio + moderner 2K-/3K-Spritzguss. Verfahrensmechaniker (m/w/d) in Trochtelfingen. Mit Erfahrung oder technischer Ausbildung. Jetzt bewerben.
 
 ---
 
@@ -76,7 +76,7 @@ Bei Daigler in Trochtelfingen wird aus Kunststoff Präzision – und du bist der
 ✅ Früh-/Spätschicht
 ✅ 30 Tage Urlaub · JobRad · Fitnessstudio · Kaffee & Obst gratis
 
-Quereinsteiger:innen mit technischem Verständnis ausdrücklich willkommen.
+Mit Erfahrung an Spritzgussmaschinen oder einer technischen Ausbildung.
 Jetzt in unter 60 Sekunden bewerben. 👉
 
 **Überschrift:** Verfahrensmechaniker (m/w/d)
